@@ -1,0 +1,104 @@
+% 进展报告封面：A4 绝对定位，依据学校 Word 封面的位置与字号排版。
+% 采用 TikZ 仅影响封面；字体由 fonts/font-setup.tex 统一选择。
+\newcommand{\MidtermLatin}{\rmfamily}
+\newsavebox{\MidtermEnglishNormalBox}
+\newsavebox{\MidtermEnglishModerateBox}
+\newsavebox{\MidtermEnglishCompactBox}
+\newdimen\MidtermEnglishAvailableHeight
+\newdimen\MidtermEnglishTitleTopY
+\newdimen\MidtermEnglishTitleBottomLimitY
+\newcommand{\MidtermPrepareEnglishTitle}[2]{%
+  \sbox{#1}{{\MidtermLatin
+    \parbox[c]{180mm}{%
+      \centering\setlength{\parskip}{0pt}%
+      \linespread{#2}\fontsize{22pt}{22pt}\selectfont
+      \MidtermTitleEn}}}%
+}
+
+
+\newcommand{\MidtermCoverNode}[3]{%
+  \node[anchor=center,inner sep=0pt] at
+  ([xshift=#1mm,yshift=-#2mm]current page.north west) {#3};%
+}
+\newcommand{\MidtermCoverField}[3]{%
+  \node[anchor=west,inner sep=0pt] at
+    ([xshift=45.5mm,yshift=-#1mm]current page.north west)
+    {{\MidtermSong\fontsize{15pt}{17pt}\selectfont\makebox[55mm][s]{#2}}};%
+  \node[anchor=west,inner sep=0pt] at
+    ([xshift=100.5mm,yshift=-#1mm]current page.north west)
+    {{\MidtermSong\fontsize{15pt}{17pt}\selectfont\underline{\makebox[64mm][c]{#3}}}};%
+}
+\begin{titlepage}
+\thispagestyle{empty}
+\MidtermPrepareEnglishTitle{\MidtermEnglishNormalBox}{1.5}%
+\MidtermPrepareEnglishTitle{\MidtermEnglishModerateBox}{1.35}%
+\MidtermPrepareEnglishTitle{\MidtermEnglishCompactBox}{1.2}%
+% Page-anchored cover drawing must remain in the main document.
+\ifcsname tikzexternaldisable\endcsname\tikzexternaldisable\fi
+\begin{tikzpicture}[remember picture,overlay]
+  \MidtermCoverNode{105}{53}{%
+    {\MidtermSong\fontsize{18pt}{25pt}\selectfont 西北农林科技大学}}
+  \MidtermCoverNode{105}{64.5}{%
+    {\MidtermSong\fontsize{18pt}{25pt}\selectfont
+      \underline{\makebox[24mm][c]{\MidtermGrade}}级\MidtermDegree 研究生学位论文}}
+  \MidtermCoverNode{105}{76}{%
+    {\MidtermSong\fontsize{18pt}{25pt}\selectfont 进展报告}}
+
+  % Word source: 22 pt titles with 1.5 multiple line spacing.
+  % Set the local font baseline to 22 pt so linespread=1.5 applies once.
+  % Center the Chinese title at its Word-reference position.
+  % Place the English title relative to the Chinese text box, so the
+  % separation stays consistent when the Chinese title has multiple lines.
+  \node[anchor=center,inner sep=0pt] (midterm-title-zh) at
+    ([xshift=105mm,yshift=-114mm]current page.north west) {%
+      {\MidtermHei
+       \parbox[c]{177mm}{%
+         \centering\setlength{\parskip}{0pt}%
+         \linespread{1.5}\fontsize{22pt}{22pt}\selectfont
+         \MidtermTitleZh}}};
+  % Preserve the 9.5 mm space between title groups. The English title
+  % may use tighter internal leading only when necessary to leave room
+  % above the first metadata field. The safe lower boundary is at 169 mm.
+  \pgfextracty{\MidtermEnglishTitleTopY}{\pgfpointanchor{midterm-title-zh}{south}}
+  \advance\MidtermEnglishTitleTopY by -9.5mm
+  \pgfextracty{\MidtermEnglishTitleBottomLimitY}{\pgfpointanchor{current page}{north west}}
+  \advance\MidtermEnglishTitleBottomLimitY by -169mm
+  \MidtermEnglishAvailableHeight=\dimexpr
+    \MidtermEnglishTitleTopY-\MidtermEnglishTitleBottomLimitY\relax
+
+  \def\MidtermSelectedEnglishBox{\MidtermEnglishNormalBox}%
+  \def\MidtermEnglishStretch{1.5}%
+  \ifdim\dimexpr\ht\MidtermEnglishNormalBox+\dp\MidtermEnglishNormalBox\relax>\MidtermEnglishAvailableHeight
+    \def\MidtermSelectedEnglishBox{\MidtermEnglishModerateBox}%
+    \def\MidtermEnglishStretch{1.35}%
+    \ifdim\dimexpr\ht\MidtermEnglishModerateBox+\dp\MidtermEnglishModerateBox\relax>\MidtermEnglishAvailableHeight
+      \def\MidtermSelectedEnglishBox{\MidtermEnglishCompactBox}%
+      \def\MidtermEnglishStretch{1.2}%
+      \ifdim\dimexpr\ht\MidtermEnglishCompactBox+\dp\MidtermEnglishCompactBox\relax>\MidtermEnglishAvailableHeight
+        \PackageError{nwafu-midterm}{English title exceeds available cover height}%
+          {Shorten the English title; the Chinese-English separation is fixed.}%
+      \fi
+    \fi
+  \fi
+  \typeout{Midterm English title line stretch: \MidtermEnglishStretch}%
+  \node[anchor=north,inner sep=0pt] (midterm-title-en) at
+    ([yshift=-9.5mm]midterm-title-zh.south) {\usebox{\MidtermSelectedEnglishBox}};
+
+  \MidtermCoverField{180.2}{学\hfill 院（系、所）}{\MidtermCollege}
+  \MidtermCoverField{190.9}{一级学科／专业领域}{\MidtermMajor}
+  \MidtermCoverField{201.7}{研究生姓名及学号}{\MidtermStudent\quad\MidtermStudentId}
+  \MidtermCoverField{212.5}{指导教师姓名}{\MidtermSupervisor}
+  \MidtermCoverField{223.3}{中期考核小组组长签名}{\MidtermChair}
+  \MidtermCoverField{234.1}{中期考核小组成员签名}{\MidtermMembersFirst}
+  \node[anchor=west,inner sep=0pt] at
+    ([xshift=100.5mm,yshift=-244.9mm]current page.north west)
+    {{\MidtermSong\fontsize{15pt}{17pt}\selectfont
+      \underline{\makebox[64mm][c]{\MidtermMembersSecond}}}};
+
+  \MidtermCoverNode{105}{263.1}{%
+    {\MidtermSong\fontsize{15pt}{20pt}\selectfont
+      研究生通过中期考核日期：\quad\MidtermDate}}
+\end{tikzpicture}
+\ifcsname tikzexternalenable\endcsname\tikzexternalenable\fi
+\null
+\end{titlepage}

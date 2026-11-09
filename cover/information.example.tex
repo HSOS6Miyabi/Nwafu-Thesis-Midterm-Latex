@@ -1,0 +1,20 @@
+% 公开示例仅包含通用占位内容。
+% 复制为 information-private.tex（Git 忽略该文件）后再填写真实信息。
+\newcommand{\MidtermGrade}{20XX}
+\newcommand{\MidtermTitleZh}{进展报告中文标题第一行\\进展报告中文标题第二行}
+\newcommand{\MidtermTitleEn}{English Title of the\\Progress Report\\Goes Here}
+\newcommand{\MidtermCollege}{学院（系、所）名称}
+\newcommand{\MidtermMajor}{一级学科或专业领域}
+\newcommand{\MidtermStudent}{研究生姓名}
+\newcommand{\MidtermStudentId}{学号}
+\newcommand{\MidtermSupervisor}{指导教师姓名、职称}
+\newcommand{\MidtermChair}{考核小组组长签名}
+\newcommand{\MidtermMembersFirst}{考核小组成员签名}
+\newcommand{\MidtermMembersSecond}{其他考核小组成员签名}
+\newcommand{\MidtermDate}{20XX 年 XX 月 XX 日}
+
+% 直接读取 nwafuthesis 的 master / doctor 文档类选项，自动显示硕士或博士。
+\ExplSyntaxOn
+\NewDocumentCommand{\MidtermDegree}{}
+  {\int_compare:nNnTF {\g__nwafu_thesis_type_int} = {1} {博士} {硕士}}
+\ExplSyntaxOff

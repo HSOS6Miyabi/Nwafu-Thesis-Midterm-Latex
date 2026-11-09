@@ -1,0 +1,66 @@
+% !TeX program = xelatex
+% 西北农林科技大学硕士/博士研究生进展报告
+% 使用 nwafuthesis 的目录、章节、页眉页脚和参考文献格式。
+% 切换学位层次：type = master / doctor。
+% 切换单双面：oneside / twoside。
+\documentclass[type=master,twoside]{nwafuthesis}
+
+\usepackage{tikz}
+\usetikzlibrary{calc}
+% Optional local TikZ figure caching, enabled by scripts/build-fast.sh.
+\IfFileExists{tikz-cache/enable.tex}{%
+  \usetikzlibrary{external}%
+  \tikzexternalize[prefix=tikz-cache/]%
+}{}
+\usepackage{booktabs}
+\usepackage{amsmath}
+
+% The cover and body share the automatically selected font families.
+\input{fonts/font-setup.tex}
+
+% ======================= 封面个人信息填写 =======================
+% 1. 复制 cover/information.example.tex 为 cover/information-private.tex。
+% 2. 仅在 cover/information-private.tex 中填写年级、中英文论文标题、
+%    学院、专业、姓名、学号、指导教师、中期考核小组成员和日期。
+% 3. information-private.tex 已被 .gitignore 忽略；不要把真实个人信息
+%    写入 main.tex 或 information.example.tex，也不要提交含个人信息的 PDF。
+% 未创建私人文件时，使用 information.example.tex 的公开占位数据。
+% ==============================================================
+
+\IfFileExists{cover/information-private.tex}{%
+  \input{cover/information-private.tex}%
+}{%
+  \input{cover/information.example.tex}%
+}
+
+\nwafuset{
+  style = {
+    auto-make-cover = false,
+    font = none,
+    cjk-font = none,
+    bib-resource = {bib/references.bib},
+  },
+  info = {
+    ptype = academic,
+    title = {进展报告},
+    title* = {Thesis Progress Report},
+  },
+}
+
+\input{styles/midterm-header.tex}
+
+\begin{document}
+\input{cover/cover.tex}
+\makefront
+\mainmatter
+\MidtermApplyRunningHeader
+\include{contents/01-purpose}
+\include{contents/02-route}
+\include{contents/03-progress}
+\include{contents/04-achievements}
+\include{contents/05-challenges}
+\include{contents/06-plan}
+\bibmatter*
+\MidtermApplyRunningHeader
+\printbibliography
+\end{document}

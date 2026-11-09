@@ -1,0 +1,136 @@
+name: LaTeX CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-examples:
+    name: Compile and validate progress report PDFs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Reject committed private metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files --cached -- cover/information-private.tex cover/information.tex | grep -q .; then
+            echo 'Private metadata must not be committed.' >&2
+            exit 1
+          fi
+
+      - name: Validate Git ignore rules
+        run: bash scripts/test-gitignore.sh
+
+      - name: Install fonts and PDF inspection tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            fonts-croscore fonts-dejavu-core fonts-liberation \
+            fonts-noto-cjk poppler-utils poppler-data
+          fc-cache -f
+
+      - name: Install TeX Live 2026
+        uses: zauguin/install-texlive@v4
+        with:
+          texlive_version: 2026
+          cache_version: 1
+          packages: >-
+            scheme-basic
+            amsmath
+            biber
+            biblatex
+            biblatex-gb7714-2015
+            bigfoot
+            booktabs
+            caption
+            ctex
+            enumitem
+            etoolbox
+            fancyhdr
+            fandol
+            xits
+            fontspec
+            footmisc
+            geometry
+            hyperref
+            l3kernel
+            l3packages
+            latexmk
+            ninecolors
+            ntheorem
+            nwafuthesis
+            pgf
+            mwe
+            csvsimple
+            siunitx
+            tabularray
+            titlesec
+            unicode-math
+            xcolor
+            xetex
+            xstring
+            zhnumber
+
+      - name: Verify toolchain
+        run: |
+          set -euo pipefail
+          command -v xelatex
+          command -v biber
+          command -v latexmk
+          kpsewhich nwafuthesis.cls
+          kpsewhich FandolSong-Regular.otf
+          kpsewhich FandolHei-Regular.otf
+          kpsewhich XITS-Regular.otf
+
+      - name: Test incremental LaTeX cache
+        run: bash scripts/test-cache-latexmk.sh
+
+      - name: Restore incremental compilation cache
+        uses: actions/cache@v4
+        with:
+          path: .latexmk-ci-cache
+          key: latexmk-${{ runner.os }}-tl2026-v1-${{ github.sha }}
+          restore-keys: |
+            latexmk-${{ runner.os }}-tl2026-v1-
+      - name: Check cross-reference source conventions
+        run: python3 scripts/check-references.py .
+
+      - name: Compile and verify three public examples
+        env:
+          MIDTERM_CI_CACHE_DIR: ${{ github.workspace }}/.latexmk-ci-cache
+        run: bash scripts/test-build.sh
+
+      - name: Validate multi-page contents headers
+        run: bash scripts/test-frontmatter-header.sh
+
+      - name: Validate midterm running headers
+        run: bash scripts/test-running-header.sh
+
+      - name: Validate extended English title spacing
+        run: bash scripts/test-cover-extended.sh
+
+      - name: Test optional TikZ figure caching
+        run: bash scripts/test-tikz-cache.sh
+
+      - name: Compile and validate formatting manual
+        env:
+          MIDTERM_CI_CACHE_DIR: ${{ github.workspace }}/.latexmk-ci-cache
+        run: bash scripts/test-examples.sh
+
+      - name: Upload example PDFs
+        uses: actions/upload-artifact@v4
+        with:
+          name: nwafu-midterm-example-pdfs
+          path: dist/*.pdf
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,54 @@
+% XeLaTeX font detection: use Word-compatible fonts when installed.
+% Cover and body use the same font selection.
+\IfFontExistsTF{Times New Roman}{%
+  \setmainfont{Times New Roman}%
+  \typeout{Midterm Latin font: Times New Roman}%
+}{%
+  \setmainfont{XITS}[
+    Extension=.otf,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+  ]%
+  \typeout{Midterm Latin font: XITS}%
+}
+\setsansfont{Liberation Sans}
+\setmonofont{DejaVu Sans Mono}
+\setmathfont{XITSMath-Regular.otf}
+
+\IfFontExistsTF{SimSun}{%
+  \setCJKfamilyfont{rm}{SimSun}[AutoFakeBold=2]%
+  \newCJKfontfamily\MidtermSong{SimSun}[AutoFakeBold=2]%
+  \typeout{Midterm Song font: SimSun}%
+}{%
+  \IfFontExistsTF{宋体}{%
+    \setCJKfamilyfont{rm}{宋体}[AutoFakeBold=2]%
+    \newCJKfontfamily\MidtermSong{宋体}[AutoFakeBold=2]%
+    \typeout{Midterm Song font: Chinese Songti}%
+  }{%
+    \setCJKfamilyfont{rm}{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]%
+    \newCJKfontfamily\MidtermSong{FandolSong-Regular.otf}[BoldFont=FandolSong-Bold.otf]%
+    \typeout{Midterm Song font: FandolSong}%
+  }%
+}
+\IfFontExistsTF{SimHei}{%
+  \setCJKfamilyfont{sf}{SimHei}[AutoFakeBold=2]%
+  \setCJKfamilyfont{nwafu@hei}{SimHei}[AutoFakeBold=2]%
+  \newCJKfontfamily\MidtermHei{SimHei}[AutoFakeBold=2]%
+  \typeout{Midterm Hei font: SimHei}%
+}{%
+  \IfFontExistsTF{黑体}{%
+    \setCJKfamilyfont{sf}{黑体}[AutoFakeBold=2]%
+    \setCJKfamilyfont{nwafu@hei}{黑体}[AutoFakeBold=2]%
+    \newCJKfontfamily\MidtermHei{黑体}[AutoFakeBold=2]%
+    \typeout{Midterm Hei font: Chinese Heiti}%
+  }{%
+    \setCJKfamilyfont{sf}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]%
+    \setCJKfamilyfont{nwafu@hei}{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]%
+    \newCJKfontfamily\MidtermHei{FandolHei-Regular.otf}[BoldFont=FandolHei-Bold.otf]%
+    \typeout{Midterm Hei font: FandolHei}%
+  }%
+}
+\setCJKfamilyfont{tt}{FandolFang-Regular.otf}
+\setCJKfamilyfont{nwafu@kai}{FandolKai-Regular.otf}
